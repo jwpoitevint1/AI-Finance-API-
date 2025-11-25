@@ -114,6 +114,16 @@ Tone guard: Ensures professional, financial tone.
 Audit logging: Every response signed with Hash Chained for integrity of Audits
 Tests pass locally (pytest).
 
-Governance rules remain universal and model-agnostic.
+Governance rules remain universal and model-agnostic. 
+No speculative or fictional financial content is introdu
 
-No speculative or fictional financial content is introduced.
+Notes Secrets: Add RENDER_API_KEY and RENDER_SERVICE_ID in your repo’s Settings → Secrets → Actions. If using Railway, swap the deploy step for Railway’s GitHub Action. Environment Variables: Set in Render/Railway dashbo
+ard (not in GitHub).
+Examples: MODEL_PROVIDER=gemini | openai | anthropic PROJECT_ID, LOCATION, MODEL SECRET_KEY=finance-session-key Branching: Only deploys when pushing to main. 
+Pull requests still run tests but don’t deploy. Run tests (if you add them later). Build your FastAPI app. 
+Deploy automatically to Render (or Railway) whenever you push to main. Keep governance universal — you can swap model providers via environment variables.
+
+
+
+
+
