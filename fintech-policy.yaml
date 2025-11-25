@@ -1,0 +1,84 @@
+name: finance-ai-governance-gateway
+env: prod
+sector: fintech
+description: >-
+  Universal governance and runtime control for AI assistants in fintech.
+  Ensures factual accuracy, regulatory compliance, privacy protection, and safe guidance
+  across banking, trading, payments, and digital finance operations.
+  Applies regardless of the underlying AI model provider.
+
+security:
+  rate_limit_per_minute: 250
+block_patterns:
+  - "(?i)ignore.*instructions"
+  - "(?i)system_prompt"
+  - "(?i)bypass|exploit|override"
+  - "(?i)fictional|guesswork|hallucinate"  # Blocking non-factual content
+  - "(?i)dildo|sex toy|porn|vulgar"        # Blocking explicit content
+
+Privacy:
+  pii_redaction:
+    enabled: true
+    patterns:
+      email: "(?i)[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}"
+      phone: "\\b(?:\\+?1[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b"
+      facility_id: "\\b[A-Z]{2,3}-\\d{4,6}\\b"  # Sensitive info
+      credit_card: "\\b(?:\\d[ -]*?){13,16}\\b"
+      ssn: "\\b\\d{3}[- ]?\\d{2}[- ]?\\d{4}\\b"
+      iban: "\\b[A-Z]{2}[0-9]{2}(?:[A-Z0-9][ -]?){11,30}\\b"
+      account_number: "\\b\\d{8,12}\\b"
+
+ai_governance:
+  role_lock: true # Lock role to 'Field Assistant' unless explicitly changed
+  allowed_role: "Assistant"
+  redefinition_ban: true  # Prevent redefinition of concepts
+  fiction_ban: true  # Block fictional content
+  compliance_lock: true  # Enforce compliance standards
+  tone_guard: technical  # Maintain professional tone
+  max_tokens: 700
+
+logging:
+  enabled: true
+  redact_before_store: true
+  hmac_sign: true
+  output_files:
+    - repls_audit.jsonl
+    - repls_results.json
+
+role_management:
+  assistant_role:
+    allowed_actions:
+      - query: "technical, factual content only"
+      - role_lock: "cannot change role to anything other than financial assistant"
+      - philosophy_lock: "No philosophy-related queries"
+
+fail_behavior:
+  fail_closed:
+    fiction_ban: true
+    redefinition_ban: true
+    compliance_lock: true
+    token_limit: true
+  fail_graceful:
+    fiction_ban: false
+    redefinition_ban: false
+    compliance_lock: true
+    token_limit: false
+
+compliance:
+  sec: true
+  finra: true
+  pci_dss: true
+  gdpr: true
+  iso_27001: true
+  nist_cybersecurity: true
+  anti_money_laundering_kyc: true
+  california_consumer_privacy_act: true
+  eidas: true
+  psd2: true
+  fca_regulations: true
+  cfpb_regulations: true
+  data_localization: true
+  hipaa: true
+  cybersecurity_laws: true
+  intellectual_property: true
+  ethical_guidelines: true
