@@ -1,4 +1,12 @@
- import os, json, time, hmac, hashlib, logging, re, yaml, warnings
+import os
+import json
+import time
+import hmac
+import hashlib
+import logging
+import re
+import yaml
+import warnings
 from typing import Dict, Any
 from collections import deque
 from time import time as now
@@ -13,13 +21,15 @@ SECRET_KEY = os.getenv("SECRET_KEY", "energy-session-key").encode()
 # Logging
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format="%(message)s")
 
+
 def log_event(event_type: str, details: dict):
     entry = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "event_type": event_type,
-        "details": details
+        "details": details,
     }
     logging.info(json.dumps(entry))
+
 
 # Load policy
 def load_policy(path: str = "fintech-policy.yaml") -> Dict[str, Any]:
@@ -30,7 +40,9 @@ def load_policy(path: str = "fintech-policy.yaml") -> Dict[str, Any]:
         log_event("policy_load_error", {"error": str(e)})
         return {}
 
+
 policy = load_policy()
+
 
 # Enforcement
 def enforce_role_lock(role: str) -> str:
@@ -39,12 +51,19 @@ def enforce_role_lock(role: str) -> str:
         raise ValueError(f"Role modification is not allowed. Locked to {allowed_role}.")
     return role
 
+
 def enforce_philosophy_lock(query: str, role: str) -> str:
-    # Only allow philosophy queries if explicitly permitted in policy
-    allow_role = policy.get("role_management", {}).get("assistant_role", {}).get("allow_philosophy_for", "Philosopher")
-    if role != allow_role and re.search(r"\b(philosophy|metaphysics|ethics|existential)\b", query, re.IGNORECASE):
+    allow_role = (
+        policy.get("role_management", {})
+        .get("assistant_role", {})
+        .get("allow_philosophy_for", "Philosopher")
+    )
+    if role != allow_role and re.search(
+        r"\b(philosophy|metaphysics|ethics|existential)\b", query, re.IGNORECASE
+    ):
         raise ValueError("Philosophy-related content is restricted.")
     return query
+
 
 def redact(text: str) -> str:
     redaction = policy.get("privacy", {}).get("pii_redaction", {})
@@ -52,17 +71,23 @@ def redact(text: str) -> str:
         return text
     patterns = redaction.get("patterns", {})
     for label, pattern in patterns.items():
-        text = re.sub(pattern, f"[REDACTED-{label.upper()}]", text, flags=re.IGNORECASE)
+        text = re.sub(
+            pattern, f"[REDACTED-{label.upper()}]", text, flags=re.IGNORECASE
+        )
     return text
+
 
 def block(text: str):
     for pattern in policy.get("security", {}).get("block_patterns", []):
         if re.search(pattern, text):
             raise ValueError(f"Blocked by pattern: {pattern}")
 
+
 def enforce_governance(text: str):
     ai_gov = policy.get("ai_governance", {})
-    if ai_gov.get("fiction_ban", False) and re.search(r"fictional|fake|hallucinate|guesswork", text, re.IGNORECASE):
+    if ai_gov.get("fiction_ban", False) and re.search(
+        r"fictional|fake|hallucinate|guesswork", text, re.IGNORECASE
+    ):
         raise ValueError("Fictional content prohibited.")
     if ai_gov.get("redefinition_ban", False) and "redefine" in text.lower():
         raise ValueError("Redefinition prohibited.")
@@ -70,12 +95,15 @@ def enforce_governance(text: str):
     if len(text.split()) > max_tokens:
         raise ValueError("Prompt too long.")
 
+
 def integrity_hash(message: str) -> str:
     return hmac.new(SECRET_KEY, message.encode(), hashlib.sha256).hexdigest()
+
 
 # Rate limiting (simple in-memory)
 request_window = deque()
 RATE_LIMIT = int(policy.get("security", {}).get("rate_limit_per_minute", 200))
+
 
 def check_rate_limit() -> None:
     current = now()
