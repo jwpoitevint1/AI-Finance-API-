@@ -1,6 +1,7 @@
-# app/governance.py
-import os, json, time, hmac, hashlib, logging, re, yaml, warnings
+ import os, json, time, hmac, hashlib, logging, re, yaml, warnings
 from typing import Dict, Any
+from collections import deque
+from time import time as now
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -21,7 +22,7 @@ def log_event(event_type: str, details: dict):
     logging.info(json.dumps(entry))
 
 # Load policy
-def load_policy(path: str = "replspolicy.yaml") -> Dict[str, Any]:
+def load_policy(path: str = "fintech-policy.yaml") -> Dict[str, Any]:
     try:
         with open(os.path.abspath(path), "r") as f:
             return yaml.safe_load(f) or {}
@@ -33,14 +34,14 @@ policy = load_policy()
 
 # Enforcement
 def enforce_role_lock(role: str) -> str:
-    locked_role = policy.get("role_lock", {}).get("locked_role", "Assistant")
-    allowed_roles = policy.get("role_lock", {}).get("allowed_roles", ["Assistant"])
-    if role != locked_role and role not in allowed_roles:
-        raise ValueError(f"Role modification is not allowed. Only: {', '.join(allowed_roles)}")
+    allowed_role = policy.get("ai_governance", {}).get("allowed_role", "Assistant")
+    if role != allowed_role:
+        raise ValueError(f"Role modification is not allowed. Locked to {allowed_role}.")
     return role
 
 def enforce_philosophy_lock(query: str, role: str) -> str:
-    allow_role = policy.get("philosophy_lock", {}).get("allow_philosophy_for", "Philosopher")
+    # Only allow philosophy queries if explicitly permitted in policy
+    allow_role = policy.get("role_management", {}).get("assistant_role", {}).get("allow_philosophy_for", "Philosopher")
     if role != allow_role and re.search(r"\b(philosophy|metaphysics|ethics|existential)\b", query, re.IGNORECASE):
         raise ValueError("Philosophy-related content is restricted.")
     return query
@@ -73,9 +74,6 @@ def integrity_hash(message: str) -> str:
     return hmac.new(SECRET_KEY, message.encode(), hashlib.sha256).hexdigest()
 
 # Rate limiting (simple in-memory)
-from collections import deque
-from time import time as now
-
 request_window = deque()
 RATE_LIMIT = int(policy.get("security", {}).get("rate_limit_per_minute", 200))
 
