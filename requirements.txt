@@ -1,3 +1,4 @@
+# Core API stack
 fastapi==0.115.0
 uvicorn[standard]==0.32.0
 pydantic==2.9.2
@@ -5,17 +6,10 @@ pyyaml==6.0.2
 httpx==0.27.2
 python-dotenv==1.0.1
 
-openai==1.52.0
-anthropic==0.37.0
-cohere==5.5.0
-google-cloud-aiplatform==1.70.0
-vertexai==1.70.0
-boto3==1.35.70
-azure-ai-ml==1.20.0
-azure-identity==1.17.1
-
+# Local model inference
 torch==2.5.1
 transformers==4.46.2
 llama-cpp-python==0.2.90
 
+# Observability
 prometheus_client==0.21.0
