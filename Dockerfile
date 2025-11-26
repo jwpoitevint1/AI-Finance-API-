@@ -1,27 +1,23 @@
-FROM python:3.11-slim AS builder
+FROM python:3.11-slim
+
 WORKDIR /app
 
-# Install build deps + git
+# Install system deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc libffi-dev git \
+    git gcc libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Python deps
 COPY requirements.txt .
 RUN pip install --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Uninstall any preinstalled transformers
-RUN pip uninstall -y transformers
-
-# Install preview branch + accelerate
-RUN pip install git+https://github.com/huggingface/transformers@v4.51.3-Qwen2.5-Omni-preview
-RUN pip install accelerate
-
-RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
-
-FROM python:3.11-slim
-WORKDIR /app
-COPY --from=builder /install /usr/local
+# Copy your app code
 COPY . .
+
+# Expose port
 ENV PORT=8000
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Launch SGLang server with Qwen model
+CMD ["python", "-m", "sglang.launch_server", "--model-path", "Qwen/Qwen3-8B", "--reasoning-parser", "qwen3"]
