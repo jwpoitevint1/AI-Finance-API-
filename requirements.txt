@@ -3,5 +3,4 @@ uvicorn[standard]
 pyyaml
 pydantic
 python-multipart
-transformers
-accelerate
+sglang>=0.4.6.post1
