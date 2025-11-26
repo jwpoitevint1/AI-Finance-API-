@@ -1,78 +1,25 @@
-# ----------------------------------------------------
-# Core Web Framework
-# ----------------------------------------------------
+# Core
 fastapi
 uvicorn[standard]
 pydantic
 pyyaml
+httpx
+python-dotenv
 
-# ----------------------------------------------------
-# A. External AI Model Provider Clients
-# ----------------------------------------------------
-google-cloud-aiplatform   # Google's unified ML platform client
-vertexai                  # Higher-level client for Google's Vertex AI
-openai                    # OpenAI API client
-anthropic                 # Anthropic API client
-cohere                    # Cohere API client
-boto3                     # AWS SDK (Bedrock, SageMaker, S3)
-azure-ai-ml               # Azure ML client
-azure-identity            # Azure authentication
+# Model Providers (only keep what you use)
+openai
+anthropic
+cohere
+google-cloud-aiplatform
+vertexai
+boto3
+azure-ai-ml
+azure-identity
 
-# ----------------------------------------------------
-# B. Core ML Frameworks (Local Models)
-# ----------------------------------------------------
-torch                     # PyTorch
-transformers              # Hugging Face Transformers
-accelerate                # Hugging Face Accelerate
-sentencepiece             # Tokenizer for many LLMs
-tensorflow                # TensorFlow
-keras                     # High-level API for TensorFlow
-scikit-learn              # Traditional ML models
+# Local Models (optional)
+torch
+transformers
+llama-cpp-python
 
-# ----------------------------------------------------
-# C. Data Handling & Preprocessing
-# ----------------------------------------------------
-numpy
-pandas
-Pillow                    # Image processing
-opencv-python             # Computer vision
-
-# ----------------------------------------------------
-# D. NLP & Embeddings
-# ----------------------------------------------------
-sentence-transformers      # Sentence embeddings for RAG
-
-# ----------------------------------------------------
-# E. Vector Databases / Similarity Search
-# ----------------------------------------------------
-faiss-cpu                 # Vector search
-# hnswlib                 # Optional ANN search
-# qdrant-client           # Optional vector DB client
-# chromadb                # Optional embedded vector store
-
-# ----------------------------------------------------
-# F. LLM Orchestration Frameworks
-# ----------------------------------------------------
-langchain                 # LLM application framework
-llama-index               # Data ingestion & retrieval for LLMs
-
-# ----------------------------------------------------
-# G. Model Optimization & Serving
-# ----------------------------------------------------
-onnxruntime               # Optimized inference
-llama-cpp-python          # Efficient CPU inference for LLaMA models
-
-# ----------------------------------------------------
-# H. Observability & MLOps
-# ----------------------------------------------------
-prometheus_client         # Metrics
-opentelemetry-api         # Tracing API
-opentelemetry-sdk
-opentelemetry-exporter-otlp
-
-# ----------------------------------------------------
-# I. Utilities & Robustness
-# ----------------------------------------------------
-httpx                     # Async HTTP client
-python-dotenv             # Environment variable management
-# tenacity                # Optional retry logic
+# Observability (optional)
+prometheus_client
