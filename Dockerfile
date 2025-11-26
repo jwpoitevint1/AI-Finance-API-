@@ -19,7 +19,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Railway sets $PORT automatically
 ENV PORT=8000
 EXPOSE 8000
 
