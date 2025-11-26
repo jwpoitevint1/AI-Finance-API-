@@ -2,7 +2,6 @@ fastapi
 uvicorn[standard]
 pyyaml
 pydantic
-hmac
 python-multipart
 google-cloud-aiplatform
 vertexai
