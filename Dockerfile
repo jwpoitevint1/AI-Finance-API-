@@ -1,14 +1,15 @@
 FROM python:3.11-slim AS builder
 WORKDIR /app
 
+# Install build deps + git
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc libffi-dev \
+    gcc libffi-dev git \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --upgrade pip setuptools wheel
 
-# Remove any preinstalled transformers
+# Uninstall any preinstalled transformers
 RUN pip uninstall -y transformers
 
 # Install preview branch + accelerate
