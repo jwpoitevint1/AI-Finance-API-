@@ -6,10 +6,9 @@ pyyaml==6.0.2
 httpx==0.27.2
 python-dotenv==1.0.1
 
-# Local model inference
+# Local ML stack
 torch==2.5.1
 transformers==4.46.2
-llama-cpp-python==0.2.90
 
 # Observability
 prometheus_client==0.21.0
