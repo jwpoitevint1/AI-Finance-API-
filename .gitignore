@@ -1,11 +1,5 @@
-.env
-__pycache__/
-*.pyc
-# Ignore specific model client files
-anthropic_client.py
-aws_client.py
-azure_client.py
-cohere_client.py
-openai_client.py
-vertex_client.py
-llama_ccp.py
+/models/
+*.bin
+*.pt
+*.ckpt
+*.safetensors
