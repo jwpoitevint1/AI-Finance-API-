@@ -18,7 +18,7 @@ LOG_FILE = os.getenv("LOG_FILE", "repls_audit.jsonl")
 RESULT_FILE = os.getenv("RESULT_FILE", "repls_results.json")
 SECRET_KEY = os.getenv("SECRET_KEY", "energy-session-key").encode()
 
-# Logging
+# Logging -> writes JSON strings line-by-line to LOG_FILE via logging
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format="%(message)s")
 
 def log_event(event_type: str, details: dict):
@@ -30,8 +30,12 @@ def log_event(event_type: str, details: dict):
     }
     logging.info(json.dumps(entry))
 
+def integrity_hash(message: str) -> str:
+    """Compute HMAC-SHA256 integrity hash for a message."""
+    return hmac.new(SECRET_KEY, message.encode(), hashlib.sha256).hexdigest()
+
 def log_event_jsonl(event_type: str, details: dict, filepath: str = LOG_FILE):
-    """Append event as a JSON line to the given file, with integrity hash."""
+    """Append event as a JSON line to the given file, with integrity hash and fail-safe fallback."""
     entry = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "event_type": event_type,
@@ -43,7 +47,7 @@ def log_event_jsonl(event_type: str, details: dict, filepath: str = LOG_FILE):
             f.write(json.dumps(entry) + "\n")
     except Exception as e:
         # fall back to standard logger so errors are never silent
-        log_event("jsonl_write_error", {"error": str(e)})
+        log_event("jsonl_write_error", {"error": str(e), "event_type": event_type})
 
 # Load policy
 def load_policy(path: str = "fintech-policy.yaml") -> Dict[str, Any]:
@@ -51,10 +55,26 @@ def load_policy(path: str = "fintech-policy.yaml") -> Dict[str, Any]:
         with open(os.path.abspath(path), "r") as f:
             return yaml.safe_load(f) or {}
     except Exception as e:
-        log_event("policy_load_error", {"error": str(e)})
+        log_event_jsonl("policy_load_error", {"error": str(e), "path": path})
         return {}
 
 policy = load_policy()
+
+# Role determination and enforcement
+def determine_role(query: str, default_role: str = "Assistant") -> str:
+    """
+    Determine the role from policy, then enforce the lock.
+    - If policy.ai_governance.allowed_role exists, use it; otherwise fallback to default_role.
+    - Enforce role lock to prevent modification outside governance.
+    """
+    configured = policy.get("ai_governance", {}).get("allowed_role", default_role)
+    role = configured
+    try:
+        enforced = enforce_role_lock(role)
+        return enforced
+    except Exception as e:
+        log_event_jsonl("role_lock_violation", {"error": str(e), "requested_role": role})
+        raise
 
 # Enforcement
 def enforce_role_lock(role: str) -> str:
@@ -92,10 +112,6 @@ def enforce_governance(text: str):
     max_tokens = ai_gov.get("max_tokens", 700)
     if len(text.split()) > max_tokens:
         raise ValueError("Prompt too long.")
-
-def integrity_hash(message: str) -> str:
-    """Compute HMAC-SHA256 integrity hash for a message."""
-    return hmac.new(SECRET_KEY, message.encode(), hashlib.sha256).hexdigest()
 
 # Rate limiting (simple in-memory)
 request_window = deque()
