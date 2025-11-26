@@ -1,20 +1,31 @@
 import os
 import requests
 
-# Optional: configure endpoint via environment variable
+# Configure endpoint via environment variable (default to local inference server)
 MODEL_ENDPOINT = os.getenv("MODEL_ENDPOINT", "http://localhost:5000/generate")
 
 def call_llama(prompt: str) -> str:
     """
-    Send a prompt to your model and return the response.
-    Replace the stub below with actual inference logic.
+    Send a prompt to your model inference endpoint and return the response text.
+    Replace the stub below with actual inference logic if needed.
     """
     try:
-        # Example: if you expose a FastAPI route for inference
-        resp = requests.post(MODEL_ENDPOINT, json={"prompt": prompt}, timeout=30)
+        resp = requests.post(
+            MODEL_ENDPOINT,
+            json={"prompt": prompt},
+            headers={"Content-Type": "application/json"},
+            timeout=30,
+        )
         resp.raise_for_status()
         data = resp.json()
+        # Expecting the inference server to return {"text": "..."}
         return data.get("text", "")
+    except requests.exceptions.RequestException as e:
+        # Network or HTTP error
+        return f"Error calling model endpoint: {str(e)}"
+    except ValueError:
+        # JSON decoding error
+        return "Error: invalid response format from model endpoint"
     except Exception as e:
-        # Fail-safe: return an error string so governance can handle it
-        return f"Error calling model: {str(e)}"
+        # Catch-all for unexpected issues
+        return f"Unexpected error: {str(e)}"
