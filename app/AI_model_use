@@ -1,31 +1,31 @@
 import os
-import requests
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
-# Configure endpoint via environment variable (default to local inference server)
-MODEL_ENDPOINT = os.getenv("MODEL_ENDPOINT", "http://localhost:5000/generate")
+# Choose your Qwen model (adjust size as needed)
+MODEL_NAME = os.getenv("QWEN_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+
+# Load tokenizer and model once at import
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_NAME,
+    device_map="auto",            # auto-select CPU/GPU
+    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
+)
 
 def call_llama(prompt: str) -> str:
     """
-    Send a prompt to your model inference endpoint and return the response text.
-    Replace the stub below with actual inference logic if needed.
+    Run inference on a Qwen model and return the generated text.
     """
     try:
-        resp = requests.post(
-            MODEL_ENDPOINT,
-            json={"prompt": prompt},
-            headers={"Content-Type": "application/json"},
-            timeout=30,
+        inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=256,
+            do_sample=True,
+            temperature=0.7,
         )
-        resp.raise_for_status()
-        data = resp.json()
-        # Expecting the inference server to return {"text": "..."}
-        return data.get("text", "")
-    except requests.exceptions.RequestException as e:
-        # Network or HTTP error
-        return f"Error calling model endpoint: {str(e)}"
-    except ValueError:
-        # JSON decoding error
-        return "Error: invalid response format from model endpoint"
+        return tokenizer.decode(outputs[0], skip_special_tokens=True)
     except Exception as e:
-        # Catch-all for unexpected issues
-        return f"Unexpected error: {str(e)}"
+        return f"Error running Qwen inference: {str(e)}"
+
