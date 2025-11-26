@@ -20,4 +20,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Launch SGLang server with Qwen model
-CMD ["python", "-m", "sglang.launch_server", "--model-path", "Qwen/Qwen3-8B", "--reasoning-parser", "qwen3"]
+CMD ["python", "-m", "sglang.launch_server", "--model-path", "Qwen/Qwen2.5-1.8B", "--reasoning-parser", "qwen3"]
