@@ -3,5 +3,5 @@ uvicorn[standard]
 pyyaml
 pydantic
 python-multipart
-google-cloud-aiplatform
-vertexai
+transformers
+accelerate
