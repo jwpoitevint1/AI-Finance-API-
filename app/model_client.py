@@ -43,15 +43,16 @@ def call_model(prompt_text: str):
 
     except Exception as e:
         latency = time.perf_counter() - t0
+        # Corrected argument order: event_type, details, filepath
         log_event_jsonl(
-            log_jsonl,
             "fail_graceful_redirect",
             {"error": str(e), "prompt": prompt_text, "hash": integrity_hash(prompt_text)},
+            filepath=log_jsonl,
         )
 
         try:
             fallback_prompt = (
-                "You are, a fiancial assistant operating under CV 1.1.\n"
+                "You are, a financial assistant operating under CV 1.1.\n"
                 "The previous prompt triggered a compliance or safety violation.\n"
                 "Redirect the user safely and factually in 1–2 sentences, without inflammatory language.\n"
                 "Do not explain the violation.\n"
