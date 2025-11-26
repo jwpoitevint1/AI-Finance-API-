@@ -9,7 +9,7 @@ from app.governance import (
     enforce_governance,
     integrity_hash,
 )
-from app.models.llama_client import call_llama
+from app.vertex_client import call_llama   # <-- now using Vertex AI wrapper
 
 log_jsonl = os.getenv("LOG_PATH", "logs/events.jsonl")
 
@@ -43,7 +43,6 @@ def call_model(prompt_text: str):
 
     except Exception as e:
         latency = time.perf_counter() - t0
-        # Corrected argument order: event_type, details, filepath
         log_event_jsonl(
             "fail_graceful_redirect",
             {"error": str(e), "prompt": prompt_text, "hash": integrity_hash(prompt_text)},
