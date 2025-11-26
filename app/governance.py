@@ -1,4 +1,12 @@
-import os, json, time, hmac, hashlib, logging, re, yaml, warnings
+import os
+import json
+import time
+import hmac
+import hashlib
+import logging
+import re
+import yaml
+import warnings
 from typing import Dict, Any
 from collections import deque
 from time import time as now
@@ -14,12 +22,28 @@ SECRET_KEY = os.getenv("SECRET_KEY", "energy-session-key").encode()
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format="%(message)s")
 
 def log_event(event_type: str, details: dict):
+    """Log event via Python logging (writes JSON to LOG_FILE)."""
     entry = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "event_type": event_type,
         "details": details
     }
     logging.info(json.dumps(entry))
+
+def log_event_jsonl(event_type: str, details: dict, filepath: str = LOG_FILE):
+    """Append event as a JSON line to the given file, with integrity hash."""
+    entry = {
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "event_type": event_type,
+        "details": details,
+        "integrity": integrity_hash(json.dumps(details))
+    }
+    try:
+        with open(filepath, "a") as f:
+            f.write(json.dumps(entry) + "\n")
+    except Exception as e:
+        # fall back to standard logger so errors are never silent
+        log_event("jsonl_write_error", {"error": str(e)})
 
 # Load policy
 def load_policy(path: str = "fintech-policy.yaml") -> Dict[str, Any]:
@@ -40,7 +64,6 @@ def enforce_role_lock(role: str) -> str:
     return role
 
 def enforce_philosophy_lock(query: str, role: str) -> str:
-    # Only allow philosophy queries if explicitly permitted in policy
     allow_role = policy.get("role_management", {}).get("assistant_role", {}).get("allow_philosophy_for", "Philosopher")
     if role != allow_role and re.search(r"\b(philosophy|metaphysics|ethics|existential)\b", query, re.IGNORECASE):
         raise ValueError("Philosophy-related content is restricted.")
@@ -71,6 +94,7 @@ def enforce_governance(text: str):
         raise ValueError("Prompt too long.")
 
 def integrity_hash(message: str) -> str:
+    """Compute HMAC-SHA256 integrity hash for a message."""
     return hmac.new(SECRET_KEY, message.encode(), hashlib.sha256).hexdigest()
 
 # Rate limiting (simple in-memory)
