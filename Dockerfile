@@ -1,25 +1,14 @@
-FROM python:3.11-slim
-
+FROM python:3.11-slim AS builder
 WORKDIR /app
-
-# Install only minimal system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libffi-dev \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements and install Python deps
+RUN apt-get update && apt-get install -y gcc libffi-dev git curl
 COPY requirements.txt .
 RUN pip install --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 
-# Copy application code
+FROM python:3.11-slim
+WORKDIR /app
+COPY --from=builder /install /usr/local
 COPY . .
-
-# Railway sets $PORT automatically
 ENV PORT=8000
 EXPOSE 8000
-
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
