@@ -6,8 +6,6 @@ anthropic_client.py
 aws_client.py
 azure_client.py
 cohere_client.py
-llama_cpp_client.py
-llamma_client.py
 openai_client.py
 vertex_client.py
 
