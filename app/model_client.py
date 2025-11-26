@@ -9,7 +9,7 @@ from app.governance import (
     enforce_governance,
     integrity_hash,
 )
-from app.vertex_client import call_llama   # <-- now using Vertex AI wrapper
+from app.AI_model_use import call_llama   # <-- fixed import
 
 log_jsonl = os.getenv("LOG_PATH", "logs/events.jsonl")
 
@@ -68,3 +68,5 @@ def call_model(prompt_text: str):
                 "fallback",
                 integrity_hash(prompt_text),
             )
+
+   
