@@ -1,4 +1,8 @@
-fastapi==0.115.0
-uvicorn[standard]==0.32.0
-torch==2.5.1
-transformers==4.46.2
+fastapi
+uvicorn[standard]
+pyyaml
+pydantic
+hmac
+python-multipart
+google-cloud-aiplatform
+vertexai
