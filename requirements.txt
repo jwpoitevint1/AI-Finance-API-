@@ -6,3 +6,7 @@ google-cloud-aiplatform
 vertexai
 openai
 anthropic
+torch
+transformers
+accelerate
+sentencepiece
