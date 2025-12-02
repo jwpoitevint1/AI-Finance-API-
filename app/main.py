@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from app.governance import block, redact, enforce_governance, enforce_role_lock, integrity_hash
-from app.model_client import call_model
+from app.model_use import call_model  # Adjusted import
 
-app = FastAPI(title="Finance AI Governance API")
+app = FastAPI(title="Finance Governance API")  # Removed 'AI' from title for neutrality
 
 class QueryRequest(BaseModel):
     prompt: str
