@@ -1,4 +1,5 @@
-import os, time
+import os
+import time
 from app.governance import (
     log_event_jsonl,
     determine_role,
@@ -9,7 +10,7 @@ from app.governance import (
     enforce_governance,
     integrity_hash,
 )
-from app.AI_model_use import call_llama   # <-- fixed import
+from app.model_use import call_model  # Renamed import for generality
 
 log_jsonl = os.getenv("LOG_PATH", "logs/events.jsonl")
 
@@ -33,7 +34,7 @@ def call_model(prompt_text: str):
         )
 
         full_prompt = preamble + prompt_text
-        response = call_llama(full_prompt)
+        response = call_model(full_prompt)
 
         if not response or not isinstance(response, str):
             raise ValueError("❌ Empty or unsafe response.")
@@ -59,7 +60,7 @@ def call_model(prompt_text: str):
                 "Respond in the same language as the original prompt.\n\n"
                 f"Original prompt:\n{prompt_text}"
             )
-            safe_response = call_llama(fallback_prompt)
+            safe_response = call_model(fallback_prompt)
             return safe_response, latency, "fallback", integrity_hash(prompt_text)
         except Exception:
             return (
@@ -68,5 +69,3 @@ def call_model(prompt_text: str):
                 "fallback",
                 integrity_hash(prompt_text),
             )
-
-   
