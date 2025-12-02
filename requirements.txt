@@ -3,3 +3,4 @@ uvicorn[standard]
 pyyaml
 pydantic
 python-multipart
+sglang>=0.4.6.post1
