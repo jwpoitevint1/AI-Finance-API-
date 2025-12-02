@@ -1,23 +1,23 @@
+# Use slim Python base image
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system deps
+# Install only essential system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git gcc libffi-dev \
+    gcc libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps
+# Copy requirements first for better layer caching
 COPY requirements.txt .
-RUN pip install --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy your app code
+# Install Python dependencies efficiently
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
 COPY . .
 
-# Expose port
+# Environment and port
 ENV PORT=8000
 EXPOSE 8000
-
-# Launch SGLang server with Qwen model
-CMD ["python", "-m", "sglang.launch_server", "--model-path", "Qwen/Qwen2.5-1.8B", "--reasoning-parser", "qwen3"]
