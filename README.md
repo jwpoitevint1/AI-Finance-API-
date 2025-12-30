@@ -5,7 +5,7 @@ The AI‑Finance‑API is a fully open‑source, model‑agnostic AI Governance 
 
 This project is released under the Apache License 2.0, allowing developers, startups, and small teams to freely use, modify, and build their own governed AI APIs on top of it.
 
-This framework is part of a broader suite of industry‑specific AI governance systems — with more than a dozen additional sector frameworks in development.
+This framework is part of a broader suite of industry‑specific AI governance systems, with more than a dozen additional sector frameworks in development.
 
 🚀 Purpose
 Financial institutions face strict regulatory, privacy, and audit requirements. This gateway ensures that any AI system used in fintech remains:
@@ -44,6 +44,17 @@ Response is tone‑checked and validated
 Interaction is logged with HMAC integrity
 
 Final governed response is returned
+
+✔️ About immutability
+If you publish this as a GitHub Release and you enable Release Immutability, then:
+
+this version cannot be modified,
+
+the tag and assets become locked,
+
+and the release becomes permanent and tamper‑proof.
+
+That’s ideal for a governance‑focused project.
 
 📂 Project Structure
 Code
