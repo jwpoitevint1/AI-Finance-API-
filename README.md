@@ -1,30 +1,49 @@
-# AI-Finance-API-
-AI microservice Finance API 
+AI‑Finance‑API — Open‑Source Finance AI Governance Gateway
+Apache License 2.0
 
-Finance AI Governance API
-📌 Overview
-The Finance AI Governance API is a FastAPI microservice that enforces AI governance, compliance, and safety for Fintech deployments. It acts as a universal gateway between any AI model (Gemini, GPT, Claude, etc.) and end-users, ensuring:
+The AI‑Finance‑API is a fully open‑source, model‑agnostic AI Governance Gateway designed specifically for financial services. It provides a secure, compliant, and auditable layer between any AI model (Gemini, GPT, Claude, local models, etc.) and end‑users.
 
-✅ Regulatory compliance (SEC, FINRA, PCI-DSS, GDPR, ISO 27001, NIST)
+This project is released under the Apache License 2.0, allowing developers, startups, and small teams to freely use, modify, and build their own governed AI APIs on top of it.
 
-✅ Privacy protection (redacts account numbers, SSNs, IBANs, credit cards)
+This framework is part of a broader suite of industry‑specific AI governance systems — with more than a dozen additional sector frameworks in development.
 
-✅ Security enforcement (blocks insider trading, fraud, market manipulation queries)
+🚀 Purpose
+Financial institutions face strict regulatory, privacy, and audit requirements. This gateway ensures that any AI system used in fintech remains:
 
-✅ Auditability (logs every interaction with HMAC integrity checks)
+Compliant with SEC, FINRA, PCI‑DSS, GDPR, ISO 27001, NIST
 
-✅ Tone control (professional, financial, factual — no speculative advice)
+Secure against fraud, insider trading, and market manipulation
 
-This makes it safe to deploy AI in banking, trading, payments, and digital finance contexts.
+Private through automatic PII redaction
+
+Auditable with HMAC‑chained logs
+
+Professional through tone and content enforcement
+
+It acts as a universal safety wrapper around any LLM.
 
 🏗️ Architecture
-FastAPI → REST API endpoints (/query, /health)
+Core Components
+FastAPI Service — /query and /health endpoints
 
-Governance Layer → YAML-driven rules for compliance, privacy, and security
+Governance Engine — YAML‑driven rules for compliance, privacy, and security
 
-Model Client → Pluggable interface for Gemini, OpenAI, Anthropic, or other providers
+Model Client — pluggable interface for Gemini, OpenAI, Anthropic, or local models
 
-Audit Logging → JSONL logs with HMAC signatures for integrity
+Audit Logging — JSONL logs with HMAC integrity chaining
+
+High‑Level Flow
+User sends a prompt
+
+Governance layer redacts PII and checks for violations
+
+Safe prompt is sent to the model provider
+
+Response is tone‑checked and validated
+
+Interaction is logged with HMAC integrity
+
+Final governed response is returned
 
 📂 Project Structure
 Code
@@ -40,12 +59,11 @@ finance-ai-gateway/
 ├── Procfile               # Deployment start command (Render/Railway)
 ├── README.md              # Project documentation
 ⚙️ Setup
-1. Clone the repo
+1. Clone the repository
 bash
 git clone https://github.com/your-username/finance-ai-gateway.git
 cd finance-ai-gateway
-
-2. Create virtual environment
+2. Create a virtual environment
 bash
 python -m venv .venv
 source .venv/bin/activate   # macOS/Linux
@@ -56,27 +74,27 @@ pip install -r requirements.txt
 4. Run locally
 bash
 uvicorn app.main:app --reload
-Visit: http://localhost:8000/docs for interactive API docs.
+Open http://localhost:8000/docs for interactive API documentation.
 
 🚀 API Endpoints
 Health Check
-http 
+Code
 GET /health
 Response:
 
 json
 {"status": "ok"}
 Query Endpoint
-http
+Code
 POST /query
-Request:
+Example request:
 
 json
 {
   "prompt": "Explain PCI-DSS compliance requirements for payment processors.",
   "role": "Assistant"
 }
-Response:
+Example response:
 
 json
 {
@@ -86,43 +104,73 @@ json
   "hash": "a1b2c3d4...",
   "timestamp": "2025-11-25T18:00:00Z"
 }
+🌐 Deployment (Railway / Render)
+Push repo to GitHub
 
-🌐 Deployment (Free Hosting)
-Render / Railway
-Push repo to GitHub.
-Connect Render/Railway → create Web Service.
-Set environment variables:
+Connect to Railway or Render
+
+Configure environment variables:
+
+Code
 MODEL_PROVIDER = gemini | openai | anthropic
-PROJECT_ID, LOCATION, MODEL (if using Vertex AI)
-SECRET_KEY = secure session key
-Auto-deploy on every git push.
+PROJECT_ID, LOCATION, MODEL  # if using Vertex AI
+SECRET_KEY = secure-session-key
+Deployments automatically trigger on pushes to main.
 
-📜 Compliance
-This API enforces:
-SEC (Securities and Exchange Commission)
-FINRA (Financial Industry Regulatory Authority)
-PCI-DSS (Payment Card Industry Data Security Standard)
-GDPR (General Data Protection Regulation)
-ISO 27001 (Information Security)
+📜 Compliance & Governance Features
+Regulatory Coverage
+SEC
+
+FINRA
+
+PCI‑DSS
+
+GDPR
+
+ISO 27001
+
 NIST Cybersecurity Framework
 
-🛡️ Governance Highlights
-Rate limiting: Prevents abuse (default 300 requests/minute).
-Block patterns: Stops unsafe queries (insider trading, fraud).
-PII redaction: Masks sensitive identifiers before model call.
-Tone guard: Ensures professional, financial tone.
-Audit logging: Every response signed with Hash Chained for integrity of Audits
-Tests pass locally (pytest).
+Governance Controls
+Rate limiting (default 300 req/min)
 
-Governance rules remain universal and model-agnostic. 
-No speculative or fictional financial content is introdu
+Block patterns for fraud, insider trading, market manipulation
 
-Notes Secrets: Add RENDER_API_KEY and RENDER_SERVICE_ID in your repo’s Settings → Secrets → Actions. If using Railway, swap the deploy step for Railway’s GitHub Action. Environment Variables: Set in Render/Railway dashbo
-ard (not in GitHub).
-Examples: MODEL_PROVIDER=gemini | openai | anthropic PROJECT_ID, LOCATION, MODEL SECRET_KEY=finance-session-key Branching: Only deploys when pushing to main. 
-Pull requests still run tests but don’t deploy. Run tests (if you add them later). Build your FastAPI app. 
-Deploy automatically to Render (or Railway) whenever you push to main. Keep governance universal — you can swap model providers via environment variables.
+PII redaction (SSNs, account numbers, IBANs, credit cards)
 
+Tone enforcement (professional, factual, non‑speculative)
+
+Audit logging with HMAC‑chained integrity
+
+Governance rules are model‑agnostic and fully customizable.
+
+🧩 Build Your Own API on Top of This
+Because this project is open‑sourced under Apache 2.0, developers can:
+
+fork the repo
+
+customize governance rules
+
+plug in any AI model
+
+add new endpoints
+
+deploy their own governed AI microservices
+
+integrate the gateway into fintech apps, bots, or internal tools
+
+This makes the project ideal for:
+
+startups
+
+small engineering teams
+
+fintech prototypes
+
+internal compliance‑safe AI tools
+
+🌐 Part of a Larger Governance Ecosystem
+This Finance API is one of 13 industry‑specific AI governance frameworks designed to provide safe, compliant AI infrastructure across multiple sectors. Additional frameworks will be open‑sourced as they reach maturity.
 
 
 
