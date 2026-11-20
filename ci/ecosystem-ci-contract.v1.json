@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "repository": "jwpoitevint1/AI-Finance-API-",
+  "execution": {
+    "preferred": "railway",
+    "github_actions": "minimal-status-only",
+    "trigger": "changed-repository-only",
+    "fail_closed": true
+  },
+  "checks": {
+    "required": [
+      "source-integrity",
+      "secret-scan",
+      "dependency-inventory",
+      "dependency-vulnerability-scan",
+      "contract-validation",
+      "security-regression",
+      "unit-tests",
+      "build"
+    ],
+    "conditional": [
+      "database-migration-safety",
+      "opa-policy-tests",
+      "container-scan",
+      "frontend-tests",
+      "mutation-regression",
+      "deployment-smoke-test"
+    ]
+  },
+  "application_kind": "python",
+  "release": {
+    "require_exact_commit_status": true,
+    "require_immutable_artifact_digest": true,
+    "require_runtime_revision_match": true,
+    "require_live_health_evidence": true
+  },
+  "evidence": {
+    "status": "unverified",
+    "reason": "Contract registration does not prove CI execution or production release"
+  }
+}
